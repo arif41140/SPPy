@@ -263,3 +263,7 @@ performance_and_profiling
 
 docs/Makefile
 docs/make.bat
+
+# Example folders that are to be released in the future
+examples/SP/degradation
+examples/SP/multiple_conditions

@@ -43,5 +43,4 @@ ax2.set_xlabel('Time [s]')
 ax2.set_ylabel('Potential [V]')
 
 plt.tight_layout()
-plt.savefig('G:\My Drive\Writings\Electrochemical_models\SPM\overpotential_charge.png')
 plt.show()

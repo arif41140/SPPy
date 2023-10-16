@@ -14,9 +14,12 @@ SOC_LIB = 1
 SOC_init_p, SOC_init_n = 0.4956, 0.7568  # conditions in the literature source. Guo et al
 
 # Setup battery components
-cell1 = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
-cell2 = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
-cell3 = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+cell1 = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test',
+                                                 SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, temp_init=T)
+cell2 = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test',
+                                                 SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, temp_init=T)
+cell3 = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test',
+                                                 SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, temp_init=T)
 
 
 # set-up cycler and solver
@@ -29,9 +32,9 @@ solver_cn = SPPy.SPPySolver(b_cell=cell3, N=5, isothermal=True, degradation=Fals
 
 # simulate
 sol_poly = solver_poly.solve(cycler_instance=dc)
-dc.reset_time_elapsed()
+dc.reset()
 sol_eigen = solver_eigen.solve(cycler_instance=dc)
-dc.reset_time_elapsed()
+dc.reset()
 sol_cn = solver_cn.solve(cycler_instance=dc)
 
 # Plot

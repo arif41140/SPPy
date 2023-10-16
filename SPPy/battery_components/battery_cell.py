@@ -2,14 +2,14 @@
 contains the class and functionality for the battery cell objects
 """
 
-__all__ = ['BatteryCellBase', 'BatteryCell', 'ECMBatteryCell']
+__all__ = ['BatteryCell', 'ECMBatteryCell']
 
 __author__ = 'Moin Ahmed'
 __copywrite__ = 'Copywrite 2023 by Moin Ahmed. All rights reserved.'
 __status__ = 'deployed'
 
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Self
 
 import numpy as np
 
@@ -19,7 +19,7 @@ from SPPy.battery_components import electrolyte, electrode
 
 
 @dataclass
-class BatteryCellBase:
+class BatteryCell:
     T_: float  # battery cell temperature, K
     rho: float  # battery density (mostly for thermal modelling), kg/m3
     Vol: float  # battery cell volume, m3
@@ -38,12 +38,16 @@ class BatteryCellBase:
         # self.T_ = self.T
         self.T_amb_ = self.T  # initial condition
         # initialize internal cell resistance
-        self.R_cell = (self.elec_p.L / self.elec_p.kappa_eff + self.electrolyte.L / self.electrolyte.kappa_eff + \
+        self.R_cell = (self.elec_p.L / self.elec_p.kappa_eff + self.electrolyte.L / self.electrolyte.kappa_sep_eff + \
                        self.elec_n.L / self.elec_n.kappa_eff) / self.elec_n.A
         self.R_cell_init = self.R_cell
 
     @property
-    def T(self):
+    def T(self) -> float:
+        """
+        Represents the lumped battery cell temperature [K]
+        :return: Lumped battery cell temperature [K]
+        """
         return self.T_
 
     @T.setter
@@ -56,12 +60,9 @@ class BatteryCellBase:
     def T_amb(self):
         return self.T_amb_
 
-
-class BatteryCell(BatteryCellBase):
-    """
-    Class for the BatteryCell object and contains the relevant parameters.
-    """
-    def __init__(self, parameter_set_name: str, SOC_init_p: float, SOC_init_n: float, T: float):
+    @classmethod
+    def read_from_parametersets(cls, parameter_set_name: str, SOC_init_p: float, SOC_init_n: float,
+                                temp_init: float) -> Self:
         param_set = ParameterSets(name=parameter_set_name)
         df = ParameterSets.parse_csv(file_path=param_set.BATTERY_CELL_DIR)
         rho = df['Density [kg m^-3]']
@@ -73,13 +74,13 @@ class BatteryCell(BatteryCellBase):
         V_max = df['Maximum Potential Cut-off [V]']
         V_min = df['Minimum Potential Cut-off [V]']
         # initialize electrodes and electrolyte
-        obj_elec_p = electrode.NElectrode(L=param_set.L_p, A=param_set.A_p, kappa=param_set.kappa_p,
+        obj_elec_p = electrode.PElectrode(L=param_set.L_p, A=param_set.A_p, kappa=param_set.kappa_p,
                                           epsilon=param_set.epsilon_p, S=param_set.S_p, max_conc=param_set.max_conc_p,
                                           R=param_set.R_p, k_ref=param_set.k_ref_p, D_ref=param_set.D_ref_p,
                                           Ea_R=param_set.Ea_R_p, Ea_D=param_set.Ea_D_p, alpha=param_set.alpha_p,
                                           T_ref=param_set.T_ref_p, brugg=param_set.brugg_p,
                                           func_OCP=param_set.OCP_ref_p_, func_dOCPdT=param_set.dOCPdT_p_,
-                                          SOC_init=SOC_init_p, T=T)
+                                          SOC_init=SOC_init_p, T=temp_init)
         obj_elec_n = electrode.NElectrode(L=param_set.L_n, A=param_set.A_n, kappa=param_set.kappa_n,
                                           epsilon=param_set.epsilon_n, S=param_set.S_n, max_conc=param_set.max_conc_n,
                                           R=param_set.R_n, k_ref=param_set.k_ref_n, D_ref=param_set.D_ref_n,
@@ -88,17 +89,12 @@ class BatteryCell(BatteryCellBase):
                                           func_OCP=param_set.OCP_ref_n_, func_dOCPdT=param_set.dOCPdT_n_,
                                           U_s=param_set.U_s, i_s=param_set.i_s, MW_SEI=param_set.MW_SEI,
                                           rho_SEI=param_set.rho_SEI, kappa_SEI=param_set.kappa_SEI,
-                                          SOC_init=SOC_init_n, T=T)
+                                          SOC_init=SOC_init_n, T=temp_init)
         obj_electrolyte = electrolyte.Electrolyte(L=param_set.L_es, conc=param_set.conc_es, kappa=param_set.kappa_es,
-                                                  epsilon=param_set.epsilon_es, brugg=param_set.brugg_es)
-        super().__init__(T_=T, rho=rho, Vol=Vol, C_p=C_p, h=h, A=A, cap=cap, V_max=V_max, V_min=V_min,
-                         elec_p=obj_elec_p, elec_n=obj_elec_n, electrolyte=obj_electrolyte)
+                                                  epsilon_sep=param_set.epsilon_es, brugg=param_set.brugg_es)
 
-    def __repr__(self):
-        return repr(self.elec_n)
-
-    def __str__(self):
-        return str(self.elec_n)
+        return cls(T_=temp_init, rho=rho, Vol=Vol, C_p=C_p, h=h, A=A, cap=cap, V_max=V_max, V_min=V_min,
+                   elec_p=obj_elec_p, elec_n=obj_elec_n, electrolyte=obj_electrolyte)
 
 
 @dataclass

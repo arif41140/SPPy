@@ -10,7 +10,7 @@ class TestElectrolyte(unittest.TestCase):
     kappa = 0.2875
     epsilon = 0.724
     brugg = 1.5
-    test_electrolyte = electrolyte.Electrolyte(L=L, conc=c_init, kappa=kappa, brugg=brugg, epsilon=epsilon)
+    test_electrolyte = electrolyte.Electrolyte(L=L, conc=c_init, kappa=kappa, brugg=brugg, epsilon_sep=epsilon)
 
     def test_constructor(self):
         """
@@ -20,11 +20,11 @@ class TestElectrolyte(unittest.TestCase):
         self.assertEqual(self.c_init, self.test_electrolyte.conc)
         self.assertEqual(self.L, self.test_electrolyte.L)
         self.assertEqual(self.kappa, self.test_electrolyte.kappa)
-        self.assertEqual(self.epsilon, self.test_electrolyte.epsilon)
+        self.assertEqual(self.epsilon, self.test_electrolyte.epsilon_sep)
         self.assertEqual(self.brugg, self.test_electrolyte.brugg)
 
     def test_property(self):
-        self.assertEqual(0.1771110665373567, self.test_electrolyte.kappa_eff)
+        self.assertEqual(0.1771110665373567, self.test_electrolyte.kappa_sep_eff)
 
     def test_constructur_raises(self):
         with self.assertRaises(TypeError) as context:

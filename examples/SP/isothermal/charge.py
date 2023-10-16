@@ -21,7 +21,8 @@ SOC_LIB = 0.9
 SOC_init_p, SOC_init_n = 0.989011, 0.01890232
 
 # Setup battery components
-cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n,
+                                                temp_init=T)
 
 # set-up cycler and solver
 dc = SPPy.Charge(charge_current=I, V_max=V_max, SOC_LIB_max=SOC_max, SOC_LIB=SOC_LIB)

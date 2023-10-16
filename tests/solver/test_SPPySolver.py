@@ -14,7 +14,8 @@ class TestSPPySolverBasic(unittest.TestCase):
     SOC_init_n = 0.7568
     t = np.arange(0, 4000, 0.1)
     I = -1.656 * np.ones(len(t))
-    test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+    test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                         SOC_init_n=SOC_init_n, temp_init=T)
     test_solver = SPPy.SPPySolver(b_cell=test_cell, N=N, isothermal=True, degradation=False)
     def test_constructor(self):
         self.assertEqual(self.N, self.test_solver.N)
@@ -37,7 +38,8 @@ class TestSPPySolverMethods(unittest.TestCase):
     V_min = 4.0
     SOC_min = 0.1
     SOC_LIB = 0.9
-    test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+    test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                         SOC_init_n=SOC_init_n, temp_init=T)
 
     def test_solve(self):
         dc = SPPy.Discharge(discharge_current=self.I, V_min=self.V_min, SOC_LIB_min=self.SOC_min, SOC_LIB=self.SOC_LIB)
@@ -60,7 +62,8 @@ class TestSPPySolverIsothermal(unittest.TestCase):
     V_min = 4.0
     SOC_min = 0.1
     SOC_LIB = 0.9
-    test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+    test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                         SOC_init_n=SOC_init_n, temp_init=T)
     test_solver = SPPy.SPPySolver(b_cell=test_cell, N=N, isothermal=True, degradation=False)
     dc = SPPy.Discharge(discharge_current=I, V_min=V_min, SOC_LIB_min=SOC_min, SOC_LIB=SOC_LIB)
     sol = test_solver.solve(cycler_instance=dc)
@@ -93,7 +96,8 @@ class TestSPPySolverIsothermal(unittest.TestCase):
         SOC_min = 0.1
         SOC_LIB = 0.9
         T = 298.15
-        test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+        test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                             SOC_init_n=SOC_init_n, temp_init=T)
         dc = SPPy.Discharge(discharge_current=I, V_min=V_min, SOC_LIB_min=SOC_min, SOC_LIB=SOC_LIB)
         test_solver = SPPy.SPPySolver(b_cell=self.test_cell, N=self.N, isothermal=True, degradation=False,
                                       electrode_SOC_solver="poly", type='two')
@@ -114,7 +118,8 @@ class TestSppySolverNonIsothermal(unittest.TestCase):
     V_min = 4.0
     SOC_min = 0.1
     SOC_LIB = 0.9
-    test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+    test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                         SOC_init_n=SOC_init_n, temp_init=T)
     test_solver = SPPy.SPPySolver(b_cell=test_cell, N=N, isothermal=False, degradation=False)
     dc = SPPy.Discharge(discharge_current=I, V_min=V_min, SOC_LIB_min=SOC_min, SOC_LIB=SOC_LIB)
     sol = test_solver.solve(cycler_instance=dc)

@@ -8,7 +8,8 @@ class TestLumped(unittest.TestCase):
     T = 298.15
     SOC_init_p = 0.4956
     SOC_init_n = 0.7568
-    test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+    test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                         SOC_init_n=SOC_init_n, temp_init=T)
     t_model = Lumped(b_cell=test_cell)
 
     def test_reversible_heat_loss(self):

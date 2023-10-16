@@ -19,11 +19,21 @@ class Electrolyte:
     Class for the Electrolyte object and contains the relevant electrolyte parameters.
     """
     L: float  # seperator thickness, m3
-    conc: float  # electrolyte concentration, mol/m3
+
+    conc: float  # initial electrolyte concentration, mol/m3
     kappa: float  # ionic conductivity, S/m
-    epsilon: float  # electrolyte volume fraction
     brugg: float  # Bruggerman coefficient for electrolyte
-    func_D_e: Optional[Callable] = None
+
+    epsilon_n: Optional[float] = None  # electrolyte volume fraction in the negative electrode region
+    epsilon_sep: Optional[float] = None  # electrolyte volume fraction in the seperator region
+    epsilon_p: Optional[float] = None  # electrolyte volume fraction in the positive electrode region
+
+    t_c: Optional[float] = None  # cationic transference number
+
+    func_D_e: Optional[Callable[[float, float], float]] = None  # function that outputs the electrolyte diffusivity and
+    # takes parameters of c_e [mol/m3] and temp [K].
+    func_ln_f: Optional[Callable[[float, float], float]] = None  # function representing the (1+dlnf/dlnc_e) that takes
+    # the c_e [mol/m3] and temperature [K] parameters.
 
     def __post_init__(self):
         # Check for types of the input parameters
@@ -33,11 +43,15 @@ class Electrolyte:
             raise "Electrolyte thickness needs to be a float."
         if not isinstance(self.kappa, float):
             raise "Electrolyte conductivity needs to be a float."
-        if not isinstance(self.epsilon, float):
+        if not isinstance(self.epsilon_sep, float):
             raise "Electrolyte volume fraction needs to be a float."
         if not isinstance(self.brugg, float):
             raise "Electrolyte's bruggerman coefficient needs to be a float."
 
     @ property
-    def kappa_eff(self):
-        return self.kappa * (self.epsilon ** self.brugg)
+    def kappa_sep_eff(self) -> float:
+        """
+        Represents the effective electrolyte conductivity [S/m] in the seperator region of the battery cell
+        :return: effective electrolyte conductivity [S/m] in the seperator region
+        """
+        return self.kappa * (self.epsilon_sep ** self.brugg)

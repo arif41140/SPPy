@@ -4,7 +4,7 @@ import os
 from SPPy.battery_components.battery_cell import ParameterSets
 
 
-class TestParameterSetsBasic(unittest.TestCase):
+class TestParameterSets(unittest.TestCase):
     def test_constructor_with_valid_name(self):
         params = ParameterSets(name='test')
         self.assertEqual('test', params.name)
@@ -63,7 +63,6 @@ class TestParameterSetsBasic(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             ParameterSets('non-sense')
 
-class TestParameterSetsMethods(unittest.TestCase):
     def test_list_parameter_sets_methods(self):
         self.assertTrue(self.check_for_parameter_sets('test'))
 

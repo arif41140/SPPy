@@ -7,7 +7,8 @@ class TestBatteryCell(unittest.TestCase):
     T = 298.15
     SOC_init_p = 0.4956
     SOC_init_n = 0.7568
-    test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+    test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                         SOC_init_n=SOC_init_n, temp_init=T)
 
     def test_negative_electrode_parameters(self):
         """
@@ -36,7 +37,7 @@ class TestBatteryCell(unittest.TestCase):
         self.assertEqual(self.test_cell.electrolyte.conc, 1000)
         self.assertEqual(self.test_cell.electrolyte.L, 2e-5)
         self.assertEqual(self.test_cell.electrolyte.kappa, 0.2875)
-        self.assertEqual(self.test_cell.electrolyte.epsilon, 0.724)
+        self.assertEqual(self.test_cell.electrolyte.epsilon_sep, 0.724)
         self.assertEqual(self.test_cell.electrolyte.brugg, 1.5)
 
     def test_battery_cell_parameters(self):
@@ -53,7 +54,7 @@ class TestBatteryCell(unittest.TestCase):
     def test_R_cell(self):
         self.assertEqual(0.0028230038442483246, self.test_cell.R_cell)
 
-    def test_T(self):
+    def test_temp(self):
         """
         This test method checks if the temperature is properly assigned to the object after the temperature
         parameter is changed.
@@ -62,7 +63,8 @@ class TestBatteryCell(unittest.TestCase):
         T = 298.15
         SOC_init_p = 0.4956
         SOC_init_n = 0.7568
-        test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+        test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                             SOC_init_n=SOC_init_n, temp_init=T)
 
         self.assertEqual(test_cell.T, T)
         self.assertEqual(test_cell.elec_p.T, T)
@@ -74,14 +76,15 @@ class TestBatteryCell(unittest.TestCase):
         self.assertEqual(test_cell.elec_p.T, new_T)
         self.assertEqual(test_cell.elec_n.T, new_T)
 
-    def test_T_amb(self):
+    def test_temp_amb(self):
         """
         test_T_amb test if the ambient temperature stays constant even after temperature parameter change.
         """
         orig_T = 298.15
         SOC_init_p = 0.4956
         SOC_init_n = 0.7568
-        test_cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=orig_T)
+        test_cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p,
+                                                             SOC_init_n=SOC_init_n, temp_init=orig_T)
 
         self.assertEqual(test_cell.T_amb, orig_T)
         # Now change to new T but T_amb should not change

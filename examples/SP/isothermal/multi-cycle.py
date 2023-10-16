@@ -15,7 +15,8 @@ rest_time = 30
 SOC_init_p, SOC_init_n = 0.4956, 0.7568  # conditions in the literature source. Guo et al.
 
 # Setup battery components
-cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n,
+                                                temp_init=T)
 
 # set-up cycler and solver
 cycler = SPPy.CC(num_cycles=num_cycles, charge_current=charge_current, discharge_current=discharge_current,

@@ -59,6 +59,8 @@ V_min: float
 elec_p: electrode.PElectrode
 elec_n: electrode.NElectrode
 electrolyte: electrolyte.Electrolyte
+
+read_from_parameter_set(...) -> Self
 }
 
 @enduml

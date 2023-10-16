@@ -65,7 +65,7 @@ class TestESP(unittest.TestCase):
         j = 2.1936265167099342e-05
         i_0_ = 8.878634015491551e-06
         temp = 298.15
-        self.assertEqual(0.05335777844201581, battery.SPMe.eta(temp=temp, j=j, i_0_=i_0_))
+        self.assertAlmostEqual(0.05335777844201581, battery.SPMe.eta(temp=temp, j=j, i_0_=i_0_))
 
     def test_calc_terminal_voltage(self):
         ocp_p = 4.2

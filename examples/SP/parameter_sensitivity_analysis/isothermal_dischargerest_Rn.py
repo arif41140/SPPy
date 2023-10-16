@@ -14,7 +14,8 @@ SOC_init_p, SOC_init_n = 0.4956, 0.7568  # conditions in the literature source. 
 # Setup battery components
 lst_sol = []
 for i in range(1, 4):
-    cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+    cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test',
+                                                    SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, temp_init=T)
     cell.elec_n.R = i * 5e-6
     dc = SPPy.DischargeRest(discharge_current=I, V_min=V_min, SOC_LIB=SOC_LIB, SOC_LIB_min=SOC_min, SOC_LIB_max=1,
                             rest_time=3600)
@@ -25,4 +26,4 @@ for i in range(1, 4):
 # Plot
 SPPy.Plots(lst_sol[0],
            lst_sol[1],
-           lst_sol[2]).comprehensive_plot(save_fig='G:\My Drive\Writings\Electrochemical_models\SPM\sensitivity_Rn_dischargerest.png')
+           lst_sol[2]).comprehensive_plot()

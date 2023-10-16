@@ -15,7 +15,8 @@ SOC_LIB = 0.9
 SOC_init_p, SOC_init_n = 0.4956, 0.7568  # conditions in the literature source. Guo et al
 
 # Setup battery components
-cell = SPPy.BatteryCell(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, T=T)
+cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test',
+                                                SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n, temp_init=T)
 
 array_SOC_n = np.linspace(0, 0.8)
 array_OCV_n = cell.elec_n.func_OCP(array_SOC_n)
@@ -39,5 +40,4 @@ ax2.set_title("Positive Electrode", fontweight='bold')
 ax2.arrow(x=0.5, y=3.75, dx=0.15*0.75, dy=0, width=0.025, head_width=0.15*0.75, head_length=0.05*0.75, color='black')
 
 plt.tight_layout()
-plt.savefig('G:\My Drive\Writings\Electrochemical_models\SPM\OCP_SOC.png')
 plt.show()

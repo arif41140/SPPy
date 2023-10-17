@@ -27,6 +27,13 @@ array_D_e1 = func_D_e(array_c_e, temp=temp1)
 array_D_e2= func_D_e(array_c_e, temp=temp2)
 array_D_e3= func_D_e(array_c_e, temp=temp3)
 
+print('D_e at 800 mol/3 at 288.15: ', func_D_e(800, temp=288.15))
+print('D_e at 1000 mol/3 at 288.15: ', func_D_e(1000, temp=288.15))
+print('D_e at 800 mol/3 at 298.15: ', func_D_e(800, temp=298.15))
+print('D_e at 1000 mol/3 at 298.15: ', func_D_e(1000, temp=298.15))
+print('D_e at 800 mol/3 at 308.15: ', func_D_e(800, temp=308.15))
+print('D_e at 1000 mol/3 at 308.15: ', func_D_e(1000, temp=308.15))
+
 plt.plot(array_c_e, array_D_e1, label=temp1)
 plt.plot(array_c_e, array_D_e2, label=temp2)
 plt.plot(array_c_e, array_D_e3, label=temp3)

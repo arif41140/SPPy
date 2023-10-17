@@ -21,7 +21,6 @@ SOC_init_p, SOC_init_n = 0.4956, 0.7568  # conditions in the literature source. 
 # Setup battery components
 cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_init_p=SOC_init_p, SOC_init_n=SOC_init_n,
                                                 temp_init=T)
-print(cell)
 
 # set-up cycler and solver
 dc = SPPy.Discharge(discharge_current=I, V_min=V_min, SOC_LIB_min=SOC_min, SOC_LIB=SOC_LIB)

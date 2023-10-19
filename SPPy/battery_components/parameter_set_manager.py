@@ -20,7 +20,10 @@ class ParameterSets:
     PARAMETER_SET_DIR = PARAMETER_SET_DIR  # directory to the parameter_sets folder
 
     def __init__(self, name: str):
-        self.check_parameter_set(name)  # checks if the inputted name is available in the parameter sets.
+        # below checks if the inputted name is available in the parameter sets.
+        if not self._check_parameter_set(name):
+            raise ValueError(f"{name} not found in the existing parameter_set")
+
         self.name = name  # name of the parameter set
 
         self.POSITIVE_ELECTRODE_DIR = os.path.join(self.PARAMETER_SET_DIR, self.name, 'param_pos-electrode.csv')
@@ -29,7 +32,7 @@ class ParameterSets:
         self.BATTERY_CELL_DIR = os.path.join(self.PARAMETER_SET_DIR, self.name, 'param_battery-cell.csv')
 
         # Positive electrode parameters are extracted below
-        df = ParameterSets.parse_csv(file_path=self.POSITIVE_ELECTRODE_DIR)  # Read and parse the csv file.
+        df = ParameterSets._parse_csv(file_path=self.POSITIVE_ELECTRODE_DIR)  # Read and parse the csv file.
         self.L_p = df['Electrode Thickness [m]']
         self.A_p = df['Electrode Area [m^2]']
         self.kappa_p = df['Ionic Conductivity [S m^-1]']
@@ -46,7 +49,7 @@ class ParameterSets:
         self.brugg_p = df['Bruggerman Coefficient']
 
         # Negative electrode parameters are extracted below
-        df = ParameterSets.parse_csv(file_path=self.NEGATIVE_ELECTRODE_DIR)  # Read and parse the csv file.
+        df = ParameterSets._parse_csv(file_path=self.NEGATIVE_ELECTRODE_DIR)  # Read and parse the csv file.
         self.L_n = df['Electrode Thickness [m]']
         self.A_n = df['Electrode Area [m^2]']
         self.kappa_n = df['Ionic Conductivity [S m^-1]']
@@ -69,7 +72,7 @@ class ParameterSets:
         self.kappa_SEI = df['SEI Conductivity [S m^-1]']  # SEI conductivity [S/m]
 
         # Below extracts electrolyte parameters
-        df = ParameterSets.parse_csv(file_path=self.ELECTROLYTE_DIR)
+        df = ParameterSets._parse_csv(file_path=self.ELECTROLYTE_DIR)
         self.conc_es = df['Conc. [mol m^-3]']
         self.L_es = df['Thickness [m]']
         self.kappa_es = df['Ionic Conductivity [S m^-1]']
@@ -77,7 +80,7 @@ class ParameterSets:
         self.brugg_es = df['Bruggerman Coefficient']
 
         # Below extracts the battery cell parameters
-        df = ParameterSets.parse_csv(file_path=self.BATTERY_CELL_DIR)
+        df = ParameterSets._parse_csv(file_path=self.BATTERY_CELL_DIR)
         self.rho = df['Density [kg m^-3]']
         self.Vol = df['Volume [m^3]']
         self.C_p = df['Specific Heat [J K^-1 kg^-1]']
@@ -119,15 +122,21 @@ class ParameterSets:
         return os.listdir(cls.PARAMETER_SET_DIR)
 
     @classmethod
-    def check_parameter_set(cls, name):
+    def _check_parameter_set(cls, name) -> bool:
         """
         Checks if the inputted parameter name is in the parameter set. If not available, it raises an exception.
         """
-        if name not in cls.list_parameters_sets():
-            raise ValueError(f'{name} no in parameter sets.')
+        flag_name_present: bool = False
+        # if name not in cls.list_parameters_sets():
+        #     raise ValueError(f'{name} not in parameter sets.')
+        # else:
+        #     flag_name_present = True
+        if name in cls.list_parameters_sets():
+            flag_name_present = True
+        return flag_name_present
 
     @classmethod
-    def parse_csv(cls, file_path):
+    def _parse_csv(cls, file_path):
         """
         reads the csv file and returns a Pandas DataFrame.
         :param file_path: the absolute or relative file drectory of the csv file.

@@ -64,15 +64,14 @@ class BatteryCell:
     def read_from_parametersets(cls, parameter_set_name: str, SOC_init_p: float, SOC_init_n: float,
                                 temp_init: float) -> Self:
         param_set = ParameterSets(name=parameter_set_name)
-        df = ParameterSets.parse_csv(file_path=param_set.BATTERY_CELL_DIR)
-        rho = df['Density [kg m^-3]']
-        Vol = df['Volume [m^3]']
-        C_p = df['Specific Heat [J K^-1 kg^-1]']
-        h = df['Heat Transfer Coefficient [J s^-1 K^-1]']
-        A = df['Surface Area [m^2]']
-        cap = df['Capacity [A hr]']
-        V_max = df['Maximum Potential Cut-off [V]']
-        V_min = df['Minimum Potential Cut-off [V]']
+        rho = param_set.rho
+        Vol = param_set.Vol
+        C_p = param_set.C_p
+        h = param_set.h
+        A = param_set.A
+        cap = param_set.cap
+        V_max = param_set.V_max
+        V_min = param_set.V_min
         # initialize electrodes and electrolyte
         obj_elec_p = electrode.PElectrode(L=param_set.L_p, A=param_set.A_p, kappa=param_set.kappa_p,
                                           epsilon=param_set.epsilon_p, S=param_set.S_p, max_conc=param_set.max_conc_p,

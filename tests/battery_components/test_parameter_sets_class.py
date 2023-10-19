@@ -66,6 +66,13 @@ class TestParameterSets(unittest.TestCase):
     def test_list_parameter_sets_methods(self):
         self.assertTrue(self.check_for_parameter_sets('test'))
 
+    def test_check_parameter_sets(self):
+        # a parameter set that is present is tested below
+        self.assertTrue(ParameterSets._check_parameter_set(name='test'))
+
+        # a parameter set that is not present is tested below
+        self.assertFalse(ParameterSets._check_parameter_set(name='non_sense'))
+
     def check_for_parameter_sets(self, *args):
         for parameter_set_name in args:
             if parameter_set_name not in ParameterSets.list_parameters_sets():

@@ -29,7 +29,7 @@ def dOCVdT(SOC_LIB):
     return dOCPdT_p((SOC_LIB - SOC_p_min)/(SOC_p_max-SOC_p_min)) - dOCPdT_n((SOC_n_max-SOC_LIB)/(SOC_n_max - SOC_n_min))
 
 
-array_SOC = np.linspace(0,1)
+array_SOC = np.linspace(0, 1)
 
 # Plot
 plt.plot(array_SOC, dOCVdT(array_SOC))

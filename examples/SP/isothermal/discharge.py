@@ -23,7 +23,7 @@ cell = SPPy.BatteryCell.read_from_parametersets(parameter_set_name='test', SOC_i
                                                 temp_init=T)
 
 # set-up cycler and solver
-dc = SPPy.Discharge(discharge_current=I, V_min=V_min, SOC_LIB_min=SOC_min, SOC_LIB=SOC_LIB)
+dc = SPPy.Discharge(discharge_current=I, v_min=V_min, SOC_LIB_min=SOC_min, SOC_LIB=SOC_LIB)
 solver = SPPy.SPPySolver(b_cell=cell, N=5, isothermal=True, degradation=False, electrode_SOC_solver='poly')
 
 # simulate

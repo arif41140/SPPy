@@ -218,9 +218,9 @@ class SPPySolver(BaseSolver):
 
                     # break condition for charge and discharge if stop criteria is V-based
                     if termination_criteria == 'V':
-                        if ((step == "charge") and (V > cycler.V_max)):
+                        if ((step == "charge") and (V > cycler.v_max)):
                             step_completed = True
-                        if ((step == "discharge") and (V < cycler.V_min)):
+                        if ((step == "discharge") and (V < cycler.v_min)):
                             step_completed = True
                     # break condition for charge and discharge if stop criteria is SOC-based
                     elif termination_criteria == 'SOC':

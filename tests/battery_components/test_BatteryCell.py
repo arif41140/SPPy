@@ -1,3 +1,4 @@
+import typing
 import unittest
 
 import SPPy
@@ -94,18 +95,76 @@ class TestBatteryCell(unittest.TestCase):
 
 
 class TestECMBatteryCell(unittest.TestCase):
-    test_cell = SPPy.ECMBatteryCell(R0_ref=0.225, R1_ref=0.001, C1=0.03, temp_ref=298.15, Ea_R1=400, Ea_R0=400,
-                                    rho=1626, vol=3.38e-5, c_p=750, h=1, area=0.085,
-                                    func_eta=None, func_ocv=None, func_docvdtemp=None,
-                                    soc_init=0.1, temp_init=298.15,
-                                    cap=1.65, v_max=4.2, v_min=2.5)
 
-    def test_battery_cell_parameters(self):
-        self.assertEqual(self.test_cell.rho, 1626)
-        self.assertEqual(self.test_cell.vol, 3.38e-5)
-        self.assertEqual(self.test_cell.c_p, 750)
-        self.assertEqual(self.test_cell.h, 1)
-        self.assertEqual(self.test_cell.area, 0.085)
-        self.assertEqual(self.test_cell.cap, 1.65)
-        self.assertEqual(self.test_cell.v_max, 4.2)
-        self.assertEqual(self.test_cell.v_min, 2.5)
+    @staticmethod
+    def func_ocv(soc: float) -> float:
+        return 2.5 + 1.7 * soc
+
+    @staticmethod
+    def func_docvdtemp(soc: float):
+        return 1.0
+
+    @staticmethod
+    def func_eta(soc: float, temp: float) -> float:
+        return 1.0
+
+    test_cell_Thevenin = SPPy.ECMBatteryCell(R0_ref=0.225, R1_ref=0.001, C1=0.03, temp_ref=298.15, Ea_R1=400, Ea_R0=400,
+                                             rho=1626, vol=3.38e-5, c_p=750, h=1, area=0.085,
+                                             func_eta=func_eta, func_ocv=func_ocv, func_docvdtemp=func_docvdtemp,
+                                             soc_init=0.1, temp_init=298.15,
+                                             cap=1.65, v_max=4.2, v_min=2.5)
+
+    test_cell_ESC = SPPy.ECMBatteryCell(R0_ref=0.225, R1_ref=0.001, C1=0.03, temp_ref=298.15, Ea_R1=400, Ea_R0=400,
+                                        rho=1626, vol=3.38e-5, c_p=750, h=1, area=0.085,
+                                        func_eta=func_eta, func_ocv=func_ocv, func_docvdtemp=func_docvdtemp,
+                                        soc_init=0.1, temp_init=298.15,
+                                        cap=1.65, v_max=4.2, v_min=2.5,
+                                        M_0=4.4782e-4, M=0.0012)
+
+    def test_battery_cell_parameters_for_Thevenin_simulations(self):
+        self.assertEqual(self.test_cell_Thevenin.rho, 1626)
+        self.assertEqual(self.test_cell_Thevenin.vol, 3.38e-5)
+        self.assertEqual(self.test_cell_Thevenin.c_p, 750)
+        self.assertEqual(self.test_cell_Thevenin.h, 1)
+        self.assertEqual(self.test_cell_Thevenin.area, 0.085)
+        self.assertEqual(self.test_cell_Thevenin.cap, 1.65)
+        self.assertEqual(self.test_cell_Thevenin.v_max, 4.2)
+        self.assertEqual(self.test_cell_Thevenin.v_min, 2.5)
+
+        self.assertTrue(isinstance(self.test_cell_Thevenin.func_ocv, typing.Callable))
+        self.assertEqual(2.5, self.test_cell_Thevenin.func_ocv(soc=0.0))
+        self.assertEqual(3.35, self.test_cell_Thevenin.func_ocv(soc=0.5))
+        self.assertEqual(4.2, self.test_cell_Thevenin.func_ocv(soc=1.0))
+
+        self.assertTrue(isinstance(self.test_cell_Thevenin.func_eta, typing.Callable))
+
+        self.assertTrue(isinstance(self.test_cell_Thevenin.func_docvdtemp, typing.Callable))
+
+        self.assertTrue(self.test_cell_Thevenin.M is None)
+        self.assertTrue(self.test_cell_Thevenin.M_0 is None)
+
+
+    def test_battery_cell_parameters_for_ESC_simulations(self):
+        self.assertEqual(self.test_cell_ESC.rho, 1626)
+        self.assertEqual(self.test_cell_ESC.vol, 3.38e-5)
+        self.assertEqual(self.test_cell_ESC.c_p, 750)
+        self.assertEqual(self.test_cell_ESC.h, 1)
+        self.assertEqual(self.test_cell_ESC.area, 0.085)
+        self.assertEqual(self.test_cell_ESC.cap, 1.65)
+        self.assertEqual(self.test_cell_ESC.v_max, 4.2)
+        self.assertEqual(self.test_cell_ESC.v_min, 2.5)
+
+        self.assertTrue(isinstance(self.test_cell_ESC.func_ocv, typing.Callable))
+        self.assertEqual(2.5, self.test_cell_ESC.func_ocv(soc=0.0))
+        self.assertEqual(3.35, self.test_cell_ESC.func_ocv(soc=0.5))
+        self.assertEqual(4.2, self.test_cell_ESC.func_ocv(soc=1.0))
+
+        self.assertTrue(isinstance(self.test_cell_ESC.func_eta, typing.Callable))
+
+        self.assertTrue(isinstance(self.test_cell_ESC.func_docvdtemp, typing.Callable))
+
+        self.assertEqual(4.4782e-4, self.test_cell_ESC.M_0)
+        self.assertEqual(0.0012, self.test_cell_ESC.M)
+
+
+

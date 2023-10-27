@@ -20,12 +20,14 @@ SOC_LIB = 1
 # Modelling parameters
 SOC_init_p, SOC_init_n = 0.4956, 0.7568  # conditions in the literature source. Guo et al
 
+
 def dOCVdT(SOC_LIB):
     SOC_n_max = 0.7568
     SOC_n_min = 0
     SOC_p_min = 0.4956
     SOC_p_max = 1
     return dOCPdT_p((SOC_LIB - SOC_p_min)/(SOC_p_max-SOC_p_min)) - dOCPdT_n((SOC_n_max-SOC_LIB)/(SOC_n_max - SOC_n_min))
+
 
 array_SOC = np.linspace(0,1)
 

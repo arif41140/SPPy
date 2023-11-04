@@ -9,7 +9,7 @@ __copywrite__ = 'Copywrite 2023 by Moin Ahmed. All rights reserved.'
 __status__ = 'deployed'
 
 from dataclasses import dataclass
-from typing import Callable, Self
+from typing import Callable, Self, Optional
 
 import numpy as np
 
@@ -120,6 +120,11 @@ class ECMBatteryCell:
     func_eta: Callable  # func for the Columbic efficiency as a func of SOC and temp
     func_ocv: Callable  # func which outputs the battery OCV from its SOC
     func_docvdtemp: Callable  # function which outputs the change of OCV with respect to temperature from its SOC
+
+    # The parameters below relate the dynamic and instantaneous hysteresis
+    M_0: Optional[float] = None  # The instantaneous hysteresis co-efficient [V]
+    M: Optional[float] = None  # SOC-dependent hysteresis co-efficient [V]
+    gamma: Optional[float] = None  # Hysteresis time-constant
 
     def __post_init__(self):
         self.temp_ = self.temp_init

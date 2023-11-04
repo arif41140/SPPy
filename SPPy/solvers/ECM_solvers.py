@@ -1,3 +1,5 @@
+__all__ = ['BaseSolver', 'DTSolver', 'ESCDTSolver']
+
 __author__ = 'Moin Ahmed'
 __copywrite__ = 'Copywrite 2023 by Moin Ahmed. All rights are reserved.'
 __status__ = 'deployed'
@@ -9,7 +11,7 @@ import numpy as np
 
 from SPPy.solvers.base import timer
 from SPPy.battery_components.battery_cell import ECMBatteryCell
-from SPPy.models.ECM import Thevenin1RC
+from SPPy.models.ECM import Thevenin1RC, ESC
 from SPPy.cycler.base import BaseCycler
 from SPPy.cycler.custom import CustomCycler
 from SPPy.solvers.thermal_solvers import calc_cell_temp
@@ -218,7 +220,7 @@ class DTSolver(BaseSolver):
         """
         sol = ECMSolution()
 
-        cycling_step = CustomCycler(array_t=sol_exp.array_t, array_I=sol_exp.array_I, V_min= v_min, V_max= v_max,
+        cycling_step = CustomCycler(array_t=sol_exp.array_t, array_I=sol_exp.array_I, V_min=v_min, V_max=v_max,
                                     SOC_LIB=soc_init, SOC_LIB_min=soc_min, SOC_LIB_max=soc_max)
         array_y_true = sol_exp.array_V  # y_true is extracted from the solution object
 
@@ -273,5 +275,58 @@ class DTSolver(BaseSolver):
             # update simulation parameters
             t_prev = t_curr
             i += 1
+
+        return sol
+
+
+class ESCDTSolver(BaseSolver):
+    def __init__(self, battery_cell_instance: ECMBatteryCell, isothermal: bool):
+        super().__init__(battery_cell_instance=battery_cell_instance,
+                         isothermal=isothermal)
+
+    def solve_standard_cycling_step(self, cycler: BaseCycler, dt: float) -> ECMSolution:
+        sol = ECMSolution()
+
+        # Below are the intial simulation parameters
+        i_R1: float = 0.0
+        h: float = 0.0
+        s: float = 0.0
+
+        for cycle_no in range(cycler.num_cycles):
+            for step in cycler.cycle_steps:
+                t_prev: float = 0.0
+                step_completed: bool = False
+
+                while not step_completed:
+                    t_curr = t_prev + dt
+                    i_app: float = -cycler.get_current(step_name=step, t=t_curr)
+
+                    # The steps below calculates the cell terminal potential
+                    self.b_cell.soc = ESC.soc_next(dt=dt, i_app=i_app, SOC_prev=self.b_cell.soc, Q=self.b_cell.cap,
+                                                   eta=self.b_cell.eta)
+                    i_R1_prev: float = i_R1
+                    i_R1 = ESC.i_R1_next(dt=dt, i_app=i_app, i_R1_prev=i_R1, R1=self.b_cell.R1, C1=self.b_cell.C1)
+                    h_prev: float = h
+                    h = ESC.h_next(dt=dt, i_app=i_app, eta=self.b_cell.eta, gamma=self.b_cell.gamma,
+                                   cap=self.b_cell.cap, h_prev=h)
+                    s_prev: float = s
+                    s = ESC.s(i_app=i_app, s_prev=s)
+                    v = ESC.v(i_app=i_app, ocv=self.b_cell.ocv, R0=self.b_cell.R0, R1=self.b_cell.R1, i_R1=i_R1_prev,
+                              m_0=self.b_cell.M_0, m=self.b_cell.M, h=h_prev, s_prev=s_prev)
+                    # print(t_curr, v)
+
+                    # Loop termination criteria
+                    if (step == 'charge') and (v > cycler.v_max):
+                        step_completed = True
+                    if (step == 'discharge') and (v < cycler.v_min):
+                        step_completed = True
+                    if (step == 'rest') and (t_curr > cycler.rest_time):
+                        step_completed = True
+
+                    # Below updates the simulation parameters
+                    t_prev = t_curr
+
+                    # update solution object
+                    sol.update(t=t_curr, i_app=i_app, v=v, temp=self.b_cell.temp, soc=self.b_cell.soc, i_r1=i_R1_prev)
 
         return sol

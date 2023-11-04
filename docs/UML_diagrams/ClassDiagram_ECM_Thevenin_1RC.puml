@@ -1,0 +1,60 @@
+@startuml
+'https://plantuml.com/class-diagram
+'Simulation in Thevenin 1RC
+
+DTSolver --> ECMBatteryCell
+DTSolver --> Thevenin1RC
+
+
+class ECMBatteryCell {
+R0_ref: float
+R1_ref: float
+R0: float
+R1: float
+C1: float
+temp_ref: float
+Ea_R0: float
+Ea_R1: float
+
+rho: float
+vol: float
+c_p: float
+h: float
+area: float
+cap: float
+v_max: float
+v_min: float
+
+soc_init: float
+temp_init: float
+
+func_eta: Callable
+func_ocv: Callable
+func_docvdtemp: Callable
+
+temp()
+soc()
+}
+
+
+class Thevenin1RC {
+soc_next() -> float
+i_R1_next() -> float
+v() -> float
+}
+
+
+class DTSolver {
++ battery_cell_instance: ECMBatteryCell
++ isothermal: bool
++ b_model: Thevenin1RC
+
+- calc_v()
+- solve_custom_step()
+- solve_standard_cycling_step()
+
++ solver()
++ solve_SPKF()
+}
+
+@enduml

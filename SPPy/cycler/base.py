@@ -12,6 +12,9 @@ class BaseCycler(ABC):
     charge_current: float = field(default=0.0)  # charge current [A]
     discharge_current: float = field(default=0.0)  # discharge current [A]
     rest_time: float = field(default=0.0)  # rest time for the step "rest" [s]
+    v_min: float = field(default=2.0)
+    v_max: float = field(default=4.2)
+
     num_cycles: int = field(default=0)  # number of cycles
     cycle_steps: list = field(default_factory=lambda: [])  # list containing the sequence of the steps in a cycle
 

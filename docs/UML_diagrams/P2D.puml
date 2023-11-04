@@ -1,0 +1,57 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class ElectrolyteFVMCoordinates {
+    L_p: float
+    L_s: float
+    L_n: float
+
+    num_grid_p: int
+    num_grid_s: int
+    num_grid_n: int
+
+    dx_p: float
+    dx_s: float
+    dx_n: float
+
+    array_x_p: np.ndarray
+    array_x_s: np.ndarray
+    array_x_n: np.ndarray
+    array_x: np.ndarray
+    array_dx: np.ndarray
+}
+
+
+class ElectrodeFVMCoordinates
+{
+    L: float
+    num_grid: int
+    dx: float
+
+    array_x: np.ndarray
+    array_dx: np.ndarray
+}
+
+
+class ElectrolyteConcFVMSolver {
++ fvm_co_ords: ElectrolyteFVMCoordinates
++ t_c: float
++ c_e_init: float
+
++ epsilon_en: float
++ epsilon_esep: float
++ epsilon_ep: float
+
++ a_sn: float
++ a_sp: float
+
++ D_e: float
++ brugg: float
+
++ diags()
++ M_ce()
++ ce_j_vec()
++ solve_ce()
+}
+
+@enduml

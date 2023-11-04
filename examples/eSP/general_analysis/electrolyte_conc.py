@@ -1,11 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from SPPy.solvers.electrolyte_conc import ElectrolyteFVMCoordinates, ElectrolyteConcFVMSolver
+from SPPy.solvers.co_ordinates import ElectrolyteFVMCoordinates
+from SPPy.solvers.electrolyte_conc import ElectrolyteConcFVMSolver
 from SPPy.models.battery import SPMe
 
 
-dt = 0.1
+# Simulation parameters
+dt: float = 0.1
+t_end: int = 360  # in s
 
 co_ords = ElectrolyteFVMCoordinates(L_n=8e-5, L_s=2.5e-5, L_p=8.8e-5)
 conc_solver = ElectrolyteConcFVMSolver(fvm_co_ords=co_ords, transference=0.354,
@@ -21,7 +24,7 @@ j_n = SPMe.molar_flux_electrode(I=-1.656, S=0.7824, electrode_type='n') * np.one
 j = np.append(np.append(j_n, j_sep), j_p)
 
 
-for i in range(3600):
+for i in range(t_end):
     conc_solver.solve_ce(j=j, dt=dt, solver_method='TDMA')
 
 print(conc_solver.array_c_e)

@@ -72,6 +72,20 @@ class ElectrolyteFVMCoordinates {
 }
 
 class ElectrolyteConcFVMSolver {
++ fvm_co_ords: ElectrolyteFVMCoordinates
++ t_c: float
++ c_e_init: float
+
++ epsilon_en: float
++ epsilon_esep: float
++ epsilon_ep: float
+
++ a_sn: float
++ a_sp: float
+
++ D_e: float
++ brugg: float
+
 + diags()
 + M_ce()
 + ce_j_vec()

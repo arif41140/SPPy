@@ -1,7 +1,7 @@
 @startuml
-'https://plantuml.com/class-diagram
+!pragma layout smetana
 
-class ElectrolyteFVMCoordinates {
+class FVMCoordinates {
     L_p: float
     L_s: float
     L_n: float
@@ -22,36 +22,28 @@ class ElectrolyteFVMCoordinates {
 }
 
 
-class ElectrodeFVMCoordinates
-{
-    L: float
-    num_grid: int
-    dx: float
-
-    array_x: np.ndarray
-    array_dx: np.ndarray
-}
+'class ElectrodeFVMCoordinates {}
 
 
-class ElectrolyteConcFVMSolver {
-+ fvm_co_ords: ElectrolyteFVMCoordinates
-+ t_c: float
-+ c_e_init: float
-
-+ epsilon_en: float
-+ epsilon_esep: float
-+ epsilon_ep: float
-
-+ a_sn: float
-+ a_sp: float
-
-+ D_e: float
-+ brugg: float
-
-+ diags()
-+ M_ce()
-+ ce_j_vec()
-+ solve_ce()
-}
+'class ElectrolyteConcFVMSolver {
+'+ fvm_co_ords: ElectrolyteFVMCoordinates
+'+ t_c: float
+'+ c_e_init: float
+'
+'+ epsilon_en: float
+'+ epsilon_esep: float
+'+ epsilon_ep: float
+'
+'+ a_sn: float
+'+ a_sp: float
+'
+'+ D_e: float
+'+ brugg: float
+'
+'+ diags()
+'+ M_ce()
+'+ ce_j_vec()
+'+ solve_ce()
+'}
 
 @enduml

@@ -162,3 +162,18 @@ class SPMe:
         term_v += (l_p + 2*l_sep + l_n) * i_app / (2 * kappa_eff_avg * battery_cross_area)
         term_v += k_conc * (np.log(c_e_p) - np.log(c_e_n))
         return term_v
+
+
+class P2DM:
+    """
+    Contains class methods that calculate the general equations pertaining to the P2D Model.
+    """
+    @classmethod
+    def a_s(cls, epsilon, r) -> float:
+        """
+        Calculates the specific interfacial surface area [m] of an solid electrode phase
+        :param epsilon: Volume fraction of the active material in the solid electrode phase
+        :param r: the radius of the electrode particle [m]
+        :return: (float) specific interfacial surface area [m]
+        """
+        return 3 * epsilon / r

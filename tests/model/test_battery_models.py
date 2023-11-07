@@ -92,3 +92,11 @@ class TestESP(unittest.TestCase):
                                                  S_p=S_p, S_n=S_n, c_e_n=c_e_n, c_e_p=c_e_p, i_app=i_app, k_f_avg=5,
                                                  temp=298.15))
 
+
+class TestP2DM(unittest.TestCase):
+    def test_a_s(self):
+        # Typical value for the negative electrode containing graphite
+        self.assertEqual(340000.0, battery.P2DM.a_s(epsilon=0.68, r=6e-6))
+
+        # Typical value for the positive electrode containing NMC
+        self.assertEqual(390000.0, battery.P2DM.a_s(epsilon=0.65, r=5e-6))

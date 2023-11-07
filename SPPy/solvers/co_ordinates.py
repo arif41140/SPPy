@@ -65,3 +65,8 @@ class ElectrolyteFVMCoordinates:
         array_dx_s = self.dx_s * np.ones(len(self.array_x_s))
         array_dx_p = self.dx_p * np.ones(len(self.array_x_p))
         return np.append(np.append(array_dx_n, array_dx_s), array_dx_p)
+
+
+@dataclass
+class FVMCoordinates(ElectrolyteFVMCoordinates):
+    pass

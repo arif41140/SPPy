@@ -52,8 +52,9 @@ class TestElectrodePotentialFVMSolver(unittest.TestCase):
 
         # The flux [mol m-2 s-1] below is when a current of 1A is applied during discharge.
         j = -5.679e-6 * np.ones(5)  # row vector
-        self.assertTrue(np.array_equal(dx**2 * Constants.F * self.instance_p.a_s * j.reshape(-1,1) / self.instance_p.sigma_eff,
-                                       self.instance_p._array_j(j=j)))
+        self.assertTrue(
+            np.array_equal(dx ** 2 * Constants.F * self.instance_p.a_s * j.reshape(-1, 1) / self.instance_p.sigma_eff,
+                           self.instance_p._array_j(j=j)))
 
         j = j.reshape(-1, 1)  # column vector
         self.assertTrue(
@@ -61,21 +62,24 @@ class TestElectrodePotentialFVMSolver(unittest.TestCase):
                            self.instance_p._array_j(j=j)))
 
     def test_array_V(self):
-        actual_p = np.array([0, 0, 0, 0, 4.2]).reshape(-1,1)
-        actual_n = np.array([0, 0, 0, 0, 0]).reshape(-1,1)
+        actual_p = np.array([0, 0, 0, 0, 4.2]).reshape(-1, 1)
+        actual_n = np.array([0, 0, 0, 0, 0]).reshape(-1, 1)
 
         self.assertTrue(np.array_equal(actual_p, self.instance_p._array_V(terminal_potential=4.2)))
         self.assertTrue(np.array_equal(actual_n, self.instance_n._array_V()))
 
-    def test_solve(self):
+    def test_solve_for_relative_potential(self):
         # Below solves for the relative potential in the positive electrode
         # The flux [mol m-2 s-1] below is when a current of 2.627A is applied during discharge.
         j_n = 2.51e-5 * np.ones(5)
         j_p = -2.27e-5 * np.ones(5)
 
-        array_actual_relative_potential = np.array([[0.00165508], [0.00152267], [0.00125786], [0.00086064],
-                                                    [0.00033102]])
+        array_actual_relative_potential_n = np.array([[-9.63451689e-06], [-2.50497439e-05], [-3.66111642e-05],
+                                                      [-4.43187777e-05], [-4.81725844e-05]])
+        array_actual_relative_potential_p = np.array([[0.00165508], [0.00152267], [0.00125786], [0.00086064],
+                                                      [0.00033102]])
 
-        # print(self.instance_n.solve_phi_s(j=j_n))
-        self.assertTrue(np.allclose(array_actual_relative_potential,
+        self.assertTrue(np.allclose(array_actual_relative_potential_n,
+                                    self.instance_n.solve_phi_s(j=j_n)))
+        self.assertTrue(np.allclose(array_actual_relative_potential_p,
                                     self.instance_p.solve_phi_s(j=j_p, terminal_potential=0.0), atol=1e-8))

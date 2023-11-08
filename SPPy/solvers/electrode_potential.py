@@ -75,7 +75,9 @@ class ElectrodePotentialFVMSolver:
         :return: column vector with values in the units of V
         """
         if j.ndim == 1:
-            j = j.reshape(-1,1)
+            j = j.reshape(-1, 1)
+        print(self.a_s * constants.Constants.F * (self.dx ** 2) / self.sigma_eff)
+        print(self.a_s)
         return self.a_s * constants.Constants.F * (self.dx ** 2) * j / self.sigma_eff
 
     def solve_phi_s(self, j: npt.ArrayLike, terminal_potential: float = 0.0) -> npt.ArrayLike:

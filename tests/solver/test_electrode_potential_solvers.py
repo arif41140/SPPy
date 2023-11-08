@@ -8,18 +8,30 @@ from SPPy.solvers.electrode_potential import ElectrodePotentialFVMSolver
 
 
 class TestElectrodePotentialFVMSolver(unittest.TestCase):
-    instance_coords = FVMCoordinates(L_n=8e-5, L_s=2.5e-5, L_p=8.8e-5, num_grid_n=5, num_grid_p=5)
+    # Parameters values are obtained from the Shangwoo et al.
+    L_n = 81e-6
+    L_s = 20e-6
+    L_p = 78e-6
+
+    e_s_n = 0.68
+    e_s_p = 0.65
+    R_n = 6e-6
+    R_p = 5e-6
+    a_s_n = 3 * e_s_n / R_n
+    a_s_p = 3 * e_s_p / R_p
+
+    instance_coords = FVMCoordinates(L_n=L_n, L_s=L_s, L_p=L_p, num_grid_n=5, num_grid_s=5, num_grid_p=5)
 
     # The instance below has the realistic parameter values for the NMC electrode
     instance_p = ElectrodePotentialFVMSolver(fvm_coords=instance_coords, electrode_type='p',
-                                             a_s=39600, sigma_eff=1.57)
+                                             a_s=a_s_p, sigma_eff=1.57)
     # The instance below has realistic input parameters values for the graphite electrode
     instance_n = ElectrodePotentialFVMSolver(fvm_coords=instance_coords, electrode_type='n',
-                                             a_s=340000.0, sigma_eff=56.074)
+                                             a_s=a_s_n, sigma_eff=56.074)
 
     def test_constructor(self):
         dx = self.instance_p.coords[2] - self.instance_p.coords[1]
-        self.assertEqual(dx, self.instance_p.dx)
+        self.assertAlmostEqual(dx, self.instance_p.dx)
 
     def test_M_phi_s(self):
         actual_p = np.array([[-1., 1., 0., 0., 0.],
@@ -49,16 +61,21 @@ class TestElectrodePotentialFVMSolver(unittest.TestCase):
                            self.instance_p._array_j(j=j)))
 
     def test_array_V(self):
-        actual_p = np.array([0, 0, 0, 0, 4.2])
-        actual_n = np.array([0, 0, 0, 0, 0])
+        actual_p = np.array([0, 0, 0, 0, 4.2]).reshape(-1,1)
+        actual_n = np.array([0, 0, 0, 0, 0]).reshape(-1,1)
 
         self.assertTrue(np.array_equal(actual_p, self.instance_p._array_V(terminal_potential=4.2)))
         self.assertTrue(np.array_equal(actual_n, self.instance_n._array_V()))
 
     def test_solve(self):
-        # The flux [mol m-2 s-1] below is when a current of 1A is applied during discharge.
-        j_n = 5.679e-6 * np.ones(5)
-        j_p = -5.679e-6 * np.ones(5)
+        # Below solves for the relative potential in the positive electrode
+        # The flux [mol m-2 s-1] below is when a current of 2.627A is applied during discharge.
+        j_n = 2.51e-5 * np.ones(5)
+        j_p = -2.27e-5 * np.ones(5)
 
-        print(self.instance_n.solve_phi_s(j=j_n))
-        print(self.instance_p.solve_phi_s(j=j_p, terminal_potential=4.2))
+        array_actual_relative_potential = np.array([[0.00165508], [0.00152267], [0.00125786], [0.00086064],
+                                                    [0.00033102]])
+
+        # print(self.instance_n.solve_phi_s(j=j_n))
+        self.assertTrue(np.allclose(array_actual_relative_potential,
+                                    self.instance_p.solve_phi_s(j=j_p, terminal_potential=0.0), atol=1e-8))

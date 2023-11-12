@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 import SPPy
 from SPPy.models import battery
 
@@ -25,7 +27,6 @@ class TestSPModel(unittest.TestCase):
         self.assertEqual(-2.7018597575301726, testmodel.m(-1.656, self.k_n, self.S_n, self.max_conc_n,
                                                           soc_init_n, self.c_e))
 
-
     def test_V(self):
         T = 298.15
         soc_init_p = 0.4956
@@ -40,11 +41,12 @@ class TestSPModel(unittest.TestCase):
         m_p = testmodel.m(-1.656, self.k_p, self.S_p, self.max_conc_p, soc_init_p, self.c_e)
         m_n = testmodel.m(-1.656, self.k_n, self.S_n, self.max_conc_n, soc_init_n, self.c_e)
         self.assertEqual(-0.28348389244322414, testmodel.m(-1.656, self.k_p, self.S_p, self.max_conc_p,
-                                                          soc_init_p, self.c_e))
+                                                           soc_init_p, self.c_e))
         self.assertEqual(-2.8860250955114384, testmodel.m(-1.656, self.k_n, self.S_n, self.max_conc_n,
                                                           soc_init_n, self.c_e))
 
-        self.assertEqual(4.032392212009281, testmodel.calc_cell_terminal_voltage(OCP_p, OCP_n, m_p, m_n, R_cell, T=T, I=I))
+        self.assertEqual(4.032392212009281,
+                         testmodel.calc_cell_terminal_voltage(OCP_p, OCP_n, m_p, m_n, R_cell, T=T, I=I))
 
 
 class TestESP(unittest.TestCase):
@@ -100,3 +102,49 @@ class TestP2DM(unittest.TestCase):
 
         # Typical value for the positive electrode containing NMC
         self.assertEqual(390000.0, battery.P2DM.a_s(epsilon=0.65, r=5e-6))
+
+    def test_i_0(self):
+        # parameter below are from Shangwoo et al
+        k_n = 2.3e-10
+        k_p = 1.43e-10
+        c_s_max_n = 31221
+        c_s_max_p = 50179
+        c_s_surf_n = 30596.579999999998
+        c_s_surf_p = 17562.649999999998
+        c_e = 900
+        c_e_0 = 1000
+
+        self.assertAlmostEqual(0.09202222696431563,
+                               battery.P2DM.i_0(k=k_n, c_s_surf=c_s_surf_n, c_s_max=c_s_max_n, c_e=c_e, c_e_0=c_e_0))
+        self.assertAlmostEqual(0.31328442058013517,
+                               battery.P2DM.i_0(k=k_p, c_s_surf=c_s_surf_p, c_s_max=c_s_max_p, c_e=c_e, c_e_0=c_e_0))
+
+        # Below tests for the exchange current equation using the Numpy arrays
+        c_s_surf_n = np.array([30596.58, 30000, 28000, 25000, 24000])
+        c_e = np.array([900, 1000, 990, 1000, 800])
+        c_e_0 = np.array([1000, 1000, 1000, 1000, 1000])
+
+        actual_i_0_n = np.array([0.09202222696431563, 0.13431208741651982, 0.20969526054264584,
+                                 0.27675580843377356, 0.2613039208124068])
+
+        self.assertTrue(np.allclose(actual_i_0_n,
+                                    battery.P2DM.i_0(k=k_n,
+                                                     c_s_surf=c_s_surf_n, c_s_max=c_s_max_n,
+                                                     c_e=c_e, c_e_0=c_e_0)))
+
+    def test_v_n_minus_v_e(self):
+        array_rel_eta_n = np.array([-0.06276411, -0.06191974, -0.06021835, -0.05717165, -0.05351207])
+        array_i_0_n = np.array([0.00388174, 0.00388174, 0.00388174, 0.00388174, 0.00388174])
+        array_x_n = np.array([8.10e-06, 2.43e-05, 4.05e-05, 5.67e-05, 7.29e-05])
+
+        i_app = 4
+        temp = 298.15
+        cell_area = 0.06
+        a_s_n = 340000
+        L_n = 81e-6
+
+        v_e = battery.P2DM.v_n_minus_v_e(array_i_0_n=array_i_0_n,
+                                         array_eta_rel_n=array_rel_eta_n,
+                                         array_coord_n=array_x_n,
+                                         i_app=i_app, temp=temp, a_s_n=a_s_n, cell_area=cell_area, L_n=L_n)
+        self.assertEqual(-0.92599193513242, v_e)

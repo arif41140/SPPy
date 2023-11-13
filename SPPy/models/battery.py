@@ -189,7 +189,7 @@ class P2DM:
             c_s_surf: Union[float, npt.ArrayLike], c_s_max: float,
             c_e: Union[float, npt.ArrayLike],
             c_e_0: Union[float, npt.ArrayLike]) -> Union[float, npt.ArrayLike]:
-        return Constants.F * k * (c_s_max - c_s_surf) ** 0.5 * c_s_surf ** 0.5 * (c_e / c_e_0) ** 0.5
+        return Constants.F * k * ((c_s_max - c_s_surf) ** 0.5) * (c_s_surf ** 0.5) * (c_e / c_e_0) ** 0.5
 
     @classmethod
     def v_n_minus_v_e(cls, array_i_0_n: npt.ArrayLike, array_eta_rel_n: npt.ArrayLike, array_coord_n: npt.ArrayLike,
@@ -212,8 +212,8 @@ class P2DM:
     @classmethod
     def v_p_minus_v_e(cls, array_i_0_p: npt.ArrayLike, array_eta_rel_p: npt.ArrayLike, array_coord_p: npt.ArrayLike,
                       i_app: float, temp: float, a_s_p: float, cell_area: float, L_p_0: float, L_p: float):
-        func_i_0_p = scipy.interpolate.interp1d(array_coord_p, array_i_0_p)
-        func_eta_rel_p = scipy.interpolate.interp1d(array_coord_p, array_eta_rel_p)
+        func_i_0_p = scipy.interpolate.interp1d(array_coord_p, array_i_0_p, fill_value='extrapolate')
+        func_eta_rel_p = scipy.interpolate.interp1d(array_coord_p, array_eta_rel_p, fill_value='extrapolate')
 
         def integrand1(x: float) -> float:
             return func_i_0_p(x) * np.exp(Constants.F * func_eta_rel_p(x) / (2 * Constants.R * temp))
@@ -223,11 +223,20 @@ class P2DM:
 
         coeff = 2 * Constants.R * temp / Constants.F
         term1 = -i_app / cell_area
-        term2 = a_s_p * scipy.interpolate.quad(func=integrand1, a=L_p_0, b=L_p)
-        term3 = a_s_p * scipy.interpolate.quad(dunc=integrand2, a=L_p_0, b=L_p)
-
+        term2 = a_s_p * scipy.integrate.quad(func=integrand1, a=L_p_0, b=L_p)[0]
+        term3 = a_s_p * scipy.integrate.quad(func=integrand2, a=L_p_0, b=L_p)[0]
         return coeff * np.log((term1 + (term1**2 + 4*term2*term3)**0.5) / (2 * a_s_p * term2))
 
     @classmethod
     def v_p(cls):
         pass
+
+    @classmethod
+    def calc_eta_from_rel_eta(cls, rel_eta: npt.ArrayLike, v_terminal: float, v_terminal_e: float) -> npt.ArrayLike:
+        return rel_eta + v_terminal - v_terminal_e
+
+    @classmethod
+    def calc_j_from_BV(cls, i_0: Union[float, npt.ArrayLike], eta: Union[float, npt.ArrayLike],
+                       temp: float) -> Union[float, npt.ArrayLike]:
+        exp_term = 0.5 * Constants.F * eta / (Constants.R * temp)
+        return (i_0/Constants.F) * (np.exp(exp_term) - np.exp(-exp_term))

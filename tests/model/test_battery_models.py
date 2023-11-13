@@ -1,6 +1,7 @@
 import unittest
 
 import numpy as np
+import numpy.typing as npt
 
 import SPPy
 from SPPy.models import battery
@@ -148,3 +149,17 @@ class TestP2DM(unittest.TestCase):
                                          array_coord_n=array_x_n,
                                          i_app=i_app, temp=temp, a_s_n=a_s_n, cell_area=cell_area, L_n=L_n)
         self.assertEqual(-0.92599193513242, v_e)
+
+    def test_v_p_minum_v_e(self):
+        pass
+
+    def test_calc_eta_from_rel_eta(self):
+        array_rel_eta: npt.ArrayLike = np.array([-4.2, -4.2, -4.2, -4.2, -4.2])
+        v_terminal: float = 4.16
+        v_terminal_e: float = 0.92
+        array_actual: npt.ArrayLike = np.array([-0.96, -0.96, -0.96, -0.96, -0.96])
+
+        self.assertTrue(np.allclose(array_actual,
+                                    battery.P2DM.calc_eta_from_rel_eta(rel_eta=array_rel_eta,
+                                                                       v_terminal=v_terminal,
+                                                                       v_terminal_e=v_terminal_e)))

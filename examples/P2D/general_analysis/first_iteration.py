@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 from SPPy.calc_helpers.constants import Constants
 from SPPy.models.battery import P2DM
@@ -40,7 +41,7 @@ num_grid_s = 5
 num_grid_p = 5
 total_num_grid = num_grid_n + num_grid_s + num_grid_p
 
-i_app = 4.0  # in A. This value is roughly equal to 1.5C according to Shangwoo's parameters.
+i_app = -4.0  # in A. This value is roughly equal to 1.5C according to Shangwoo's parameters.
 soc_init_n, soc_init_p = 0.98, 0.35
 array_c_e_init = array_c_e = 1000 * np.ones(total_num_grid)
 
@@ -62,8 +63,8 @@ instance_solver = ElectrolytePotentialFVMSolver(fvm_coords=instance_coords,
                                                 a_s_n=a_s_n, a_s_p=a_s_p,
                                                 t_c=t_c, kappa_e=kappa_e, brugg=brugg, temp=temp)
 
-i_n_v = i_app / (area_cell * L_n)  # in A/m3
-i_p_v = -i_app / (area_cell * L_p)  # in A/m3
+i_n_v = -i_app / (area_cell * L_n)  # in A/m3
+i_p_v = i_app / (area_cell * L_p)  # in A/m3
 j_n = i_n_v / (Constants.F * a_s_n)  # in mol/m2
 j_p = i_p_v / (Constants.F * a_s_p)  # in mol/m2
 
@@ -75,13 +76,30 @@ phi_n = electrode_phi_n.solve_phi_s(j=array_j_n, terminal_potential=0.0)
 phi_p = electrode_phi_p.solve_phi_s(j=array_j_p, terminal_potential=0.0)
 terminal_phi_e, array_phi_e, array_rel_phi_e = instance_solver.solve_phi_e(j=array_j, c_e=array_c_e)
 
-eta_n_rel = np.ndarray.flatten(phi_n)-array_phi_e[:5]-array_ocp_n
+eta_n_rel = np.ndarray.flatten(phi_n) - array_phi_e[:5] - array_ocp_n
+eta_p_rel = np.ndarray.flatten(phi_p) - array_phi_e[-num_grid_p:] - array_ocp_p
 i_0_n = P2DM.i_0(k=k_n, c_s_surf=array_c_s_n, c_s_max=c_s_max_n,
                  c_e=array_c_e[:num_grid_n], c_e_0=array_c_e_init[:num_grid_n])
-v_e = P2DM.v_n_minus_v_e(array_i_0=i_0_n, array_eta_rel_n=eta_n_rel, array_coord_n=coords.array_x_n,
-                         i_app=i_app, temp=temp, a_s_n=a_s_n, cell_area=area_cell, L_n=L_n)
-print(eta_n_rel, i_0_n)
-print(coords.array_x_n)
-print(a_s_n)
-print(v_e)
+i_0_p = P2DM.i_0(k=k_p, c_s_surf=array_c_s_p, c_s_max=c_s_max_p,
+                 c_e=array_c_e[-num_grid_p:], c_e_0=array_c_e_init[-num_grid_p:])
+v_e = -P2DM.v_n_minus_v_e(array_i_0_n=i_0_n, array_eta_rel_n=eta_n_rel, array_coord_n=coords.array_x_n,
+                          i_app=i_app, temp=temp, a_s_n=a_s_n, cell_area=area_cell, L_n=L_n)
+v_p_minus_v_e = P2DM.v_p_minus_v_e(array_i_0_p=i_0_p, array_eta_rel_p=eta_p_rel, array_coord_p=coords.array_x_p,
+                                   i_app=i_app, temp=temp, a_s_p=a_s_p, cell_area=area_cell,
+                                   L_p_0=L_n + L_s, L_p=L_n + L_s + L_p)
+v_p: float = v_p_minus_v_e + v_e
 
+array_eta_n = P2DM.calc_eta_from_rel_eta(rel_eta=eta_n_rel, v_terminal=0.0, v_terminal_e=v_e)
+array_eta_p = P2DM.calc_eta_from_rel_eta(rel_eta=eta_p_rel, v_terminal=v_p, v_terminal_e=v_e)
+
+print(v_e)
+array_j_n_new = -P2DM.calc_j_from_BV(i_0=i_0_n, eta=array_eta_n, temp=temp)
+array_j_p_new = P2DM.calc_j_from_BV(i_0=i_0_p, eta=array_eta_p, temp=temp)
+print(array_j_n.sum(), (array_j_n_new).sum())
+# print(array_j_p, array_j_p_new/a_s_p)
+
+plt.plot(coords.array_x_n, array_j_n)
+plt.plot(coords.array_x_n, array_j_n_new)
+plt.plot(coords.array_x_p, array_j_p)
+plt.plot(coords.array_x_p, array_j_p_new)
+plt.show()

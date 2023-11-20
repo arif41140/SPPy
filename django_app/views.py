@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from bokeh.plotting import figure
 from bokeh.embed import components
 
-from .forms import SimulationVariables
+from django_app.forms import SimulationVariables
 
 
 def index(request) -> HttpResponse:
@@ -33,3 +33,4 @@ def get_simulation_inputs(request):
     solver_type = request.POST.get('solver_type')
     cycler = request.POST.get('cycler')
     print(parameter_name, battery_cell_model, solver_type, cycler)
+

@@ -1,8 +1,13 @@
+"""
+Package header for the SPPy namespace
+Provides the continuum scale battery cell simulations.
+"""
+
 __all__ = ['battery_components', 'calc_helpers', 'config', 'cycler', 'general_OCP', 'models',
            'parameter_estimations', 'solvers', 'sol_and_visualization', 'warnings_and_exceptions']
 
 __author__ = 'Moin Ahmed'
-__copywrite__ = 'Copywrite 2023 by Moin Ahmed. All rights are reserved.'
+__copyright__ = 'Copyright 2023 by Moin Ahmed. All rights are reserved.'
 __status__ = 'deployed'
 
 

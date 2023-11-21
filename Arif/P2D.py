@@ -82,11 +82,101 @@ class ElectrolytePotential:
     
     # Liquid concentration flux at negative electrode interface
     def qlin(self):
-        pass
+        A1=self.A_1()
+        A2=self.A_2()
+        A3=self.A_3()
+        B1=self.B_1()
+        B2=self.B_2()
+        B3=self.B_3()
+        D=self.D()
+        Jn=self.j_n()
+        Jp=self.j_p()
+        return -2*A2*B1*(-2*A1*A2*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) \
+                + A2*(2*A3*B1*Jn*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) \
+                - B3*Jp*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+                - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))\
+                + A3*B2*Jn*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+                - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))*Piecewise((-2*D*exp(-t*(A1 - B2\
+                + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))/(2*D))/(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)),\
+                Ne(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2), 0)),\
+                (t, True))*exp(t*(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - \
+                4*A2*B1 + B2**2))/(2*D))/(D*(A1 + B2 + sqrt(A1**2 + 2*A1*B2 \
+                - 4*A2*B1 + B2**2))*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)*(A1**2 \
+                + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 4*A2*B1 + B2**2 \
+                - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))\
+                + 2*A2*B1*(A1**2*(A2*B3*Jp - A3*B2*Jn) \
+                + A1*(A2*B3*Jp*(2*B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) \
+                - A3*B2*Jn*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))\
+                - 4*A2**2*B1*B3*Jp + A2*(2*A3*B1*Jn*(2*B2 \
+                - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) + B2**2*B3*Jp - \
+                B2*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - A3*B2**2*Jn*(B2 -\
+                sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))*Piecewise((-2*D/(A1 - \
+                B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)),\
+                 Ne(A1, A2*B1/B2)), (-2*B2*D/(A2*B1 - B2**2\
+                + B2*sqrt(A2**2*B1**2/B2**2 - 2*A2*B1+ B2**2)), True))*exp(t*(A1 - B2 + sqrt(A1**2 + \
+                2*A1*B2 - 4*A2*B1 + B2**2))/(2*D))/(D*(A1 + B2 +\
+                sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))*(A1**3 \
+                + A1**2*(3*B2 - sqrt(A1**2 + 2*A1*B2- 4*A2*B1 + B2**2)) \
+                - A1*(4*A2*B1 - 3*B2**2 + 2*B2*sqrt(A1**2 \
+                + 2*A1*B2 - 4*A2*B1 + B2**2)) - 4*A2*B1*(B2 - sqrt(A1**2 \
+                + 2*A1*B2 - 4*A2*B1 + B2**2))+ B2**3 - B2**2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))) \
+                - A2*(A1**2*B3*Jp - A1*(A3*B1*Jn - B2*B3*Jp + B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+                - 2*A2*B1*B3*Jp + A3*B1*Jn*(B2 + sqrt(A1**2 + 2*A1*B2 \
+                - 4*A2*B1 + B2**2)))*Piecewise((2*D/(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)),\
+                Ne(A1, A2*B1/B2)), (2*B2*D/(-A2*B1 + B2**2 +B2*sqrt(A2**2*B1**2/B2**2 - 2*A2*B1 + B2**2)), True))*exp(-t*(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 \
+                - 4*A2*B1 + B2**2))/(2*D))/(D*(A1 + B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+                *sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 2*A2*(A1**3*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)\
+                - A1**2*(A3*B1*Jn*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) - 2*B2*B3*Jp\
+                 *sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) + B3*Jp*(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) \
+                + A1*(-2*A2*B1*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) + A3*B1*B2*Jn\
+                *sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) + A3*B1*Jn*(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2 \
+                - 2*B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) + B2**2*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)\
+                - B2*B3*Jp*(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) + A2*B1*(2*A3*B1*Jn\
+                *sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) + B3*Jp*(A1**2 + A1*(2*B2\
+                - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))))\
+                *Piecewise((2*D*exp(t*(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 \
+                - 4*A2*B1 + B2**2))/(2*D))/(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)),\
+                Ne(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2), 0)), \
+                (t, True))*exp(-t*(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 \
+                - 4*A2*B1 + B2**2))/(2*D))/(D*(A1 + B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+                *sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+                - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))                                                                                                                                                                                             
     
     # Liquid concentration flux at positive electrode interface
     def qlip(self):
-        pass
+        A1=self.A_1()
+        A2=self.A_2()
+        A3=self.A_3()
+        B1=self.B_1()
+        B2=self.B_2()
+        B3=self.B_3()
+        D=self.D()
+        Jn=self.j_n()
+        Jp=self.j_p()
+        return B1*(-2*A1*A2*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) + A2*(2*A3*B1*Jn*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)\
+            - B3*Jp*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))\
+            + A3*B2*Jn*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))\
+            *Piecewise((-2*D*exp(-t*(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))/(2*D))/(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)),\
+            Ne(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2), 0)), (t, True))*exp(t*(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 \
+            + B2**2))/(2*D))/(D*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+            - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))) - B1*(A1**2*(A2*B3*Jp - A3*B2*Jn)\
+            + A1*(A2*B3*Jp*(2*B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - A3*B2*Jn*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))\
+            - 4*A2**2*B1*B3*Jp + A2*(2*A3*B1*Jn*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) + B2**2*B3*Jp - B2*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+            - A3*B2**2*Jn*(B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))*Piecewise((-2*D/(A1 - B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)),\
+            Ne(A1, A2*B1/B2)), (-2*B2*D/(A2*B1 - B2**2 + B2*sqrt(A2**2*B1**2/B2**2 - 2*A2*B1 + B2**2)), True))*exp(t*(A1 - B2 + sqrt(A1**2 + 2*A1*B2\
+            - 4*A2*B1 + B2**2))/(2*D))/(D*(A1**3 + A1**2*(3*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - A1*(4*A2*B1 - 3*B2**2 + 2*B2*sqrt(A1**2 + 2*A1*B2\
+            - 4*A2*B1 + B2**2)) - 4*A2*B1*(B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) + B2**3 - B2**2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))\
+            + (A1**2*B3*Jp - A1*(A3*B1*Jn - B2*B3*Jp + B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 2*A2*B1*B3*Jp + A3*B1*Jn*(B2 + sqrt(A1**2\
+            + 2*A1*B2 - 4*A2*B1 + B2**2)))*Piecewise((2*D/(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)), Ne(A1, A2*B1/B2)), (2*B2*D/(-A2*B1 + B2**2\
+            + B2*sqrt(A2**2*B1**2/B2**2 - 2*A2*B1 + B2**2)), True))*exp(-t*(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))/(2*D))/(2*D*sqrt(A1**2 + 2*A1*B2\
+            - 4*A2*B1 + B2**2)) + (A1**3*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) - A1**2*(A3*B1*Jn*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)\
+            - 2*B2*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) + B3*Jp*(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) + A1*(-2*A2*B1*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)\
+            + A3*B1*B2*Jn*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) + A3*B1*Jn*(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2 - 2*B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))\
+            + B2**2*B3*Jp*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2) - B2*B3*Jp*(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) + A2*B1*(2*A3*B1*Jn*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)\
+            + B3*Jp*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))))\
+            *Piecewise((2*D*exp(t*(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))/(2*D))/(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)),\
+            Ne(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2), 0)), (t, True))*exp(-t*(-A1 + B2 + sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2))/(2*D))/(D*sqrt(A1**2 + 2*A1*B2\
+            - 4*A2*B1 + B2**2)*(A1**2 + A1*(2*B2 - sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)) - 4*A2*B1 + B2**2 - B2*sqrt(A1**2 + 2*A1*B2 - 4*A2*B1 + B2**2)))
     
     # Liquid concentration at negative electrode interface
     def clin(self):

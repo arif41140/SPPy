@@ -20,7 +20,8 @@ class OCVData:
                  soc_n_min_1: float, soc_n_min_2: float,
                  soc_n_max_1: float, soc_n_max_2: float,
                  soc_p_min_1: float, soc_p_min_2: float,
-                 soc_p_max_1: float, soc_p_max_2: float):
+                 soc_p_max_1: float, soc_p_max_2: float,
+                 charge_or_discharge: str):
         self.func_ocp_p = func_ocp_p
         self.func_ocp_n = func_ocp_n
 
@@ -32,6 +33,8 @@ class OCVData:
         self.SOC_P_MIN_2 = soc_p_min_2
         self.SOC_P_MAX_1 = soc_p_max_1
         self.SOC_P_MAX_2 = soc_p_max_2
+
+        self.cycling_step: str = charge_or_discharge
 
         self.SOC_LIB_MIN = 0.0
         self.SOC_LIB_MAX = 1.0
@@ -49,11 +52,21 @@ class OCVData:
 
     def array_ocp_p(self, soc_min: float, soc_max: float) -> npt.ArrayLike:
         array_soc_p = self.array_soc(soc_min=soc_min, soc_max=soc_max)
-        return self.func_ocp_p(array_soc_p)
+        if self.cycling_step == 'discharge':
+            return self.func_ocp_p(array_soc_p)
+        elif self.cycling_step == 'charge':
+            return np.flip(self.func_ocp_p(array_soc_p))
+        else:
+            raise TypeError('Unknown charging step.')
 
     def array_ocp_n(self, soc_min: float, soc_max: float) -> npt.ArrayLike:
         array_soc_n = self.array_soc(soc_min=soc_min, soc_max=soc_max)
-        return np.flip(self.func_ocp_n(array_soc_n))
+        if self.cycling_step == 'discharge':
+            return np.flip(self.func_ocp_n(array_soc_n))
+        elif self.cycling_step == 'charge':
+            return self.func_ocp_n(array_soc_n)
+        else:
+            raise TypeError('Unknown charging step.')
 
     def _func_interp_ocp(self, soc_min: float, soc_max: float, interpolation_type: str) -> Callable:
         if interpolation_type == 'p':
